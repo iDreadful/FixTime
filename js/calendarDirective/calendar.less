@@ -1,0 +1,44 @@
+.calendar {
+    width: 100%;
+    & .month-year {
+        width: 100%;
+        text-align: center;
+    }
+
+    & .dows {
+        width: 100%;
+        & .dow {
+            float: left;
+            width: calc(~"100% / 7");
+            text-align: center;
+        }
+    }
+
+    & .week{
+        width: 100%;
+        clear: both;
+
+        & .day-holder {
+            float: left;
+            width: calc(~"100% / 7");            
+    
+            & .day {
+                display: block;
+                margin: 0 auto;
+                text-align: center;
+
+                &.today {
+                }
+                &.selected {
+                }
+                & .digit {
+                }
+
+                &.weekend, .different-month {
+                    & .digit{
+                    }
+                }
+            }
+        }
+    }
+}

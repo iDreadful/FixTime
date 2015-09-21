@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html
+    ng-app="app"
+    ng-controller="appController"
+    style="display: none"
+ >
+
+<head>
+    <title>TimeFix</title>
+    <meta charset="UTF-8">
+    <base href="./" />
+    <!-- Prevent app resizing and fit it into viewport -->
+        <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <!-- Core CSS -->
+    <!-- themes are loaded in app.less and are switched via appController.js -->
+        <link rel="stylesheet/less" type="text/css" href="css/app.less">
+    <!-- App CSS -->
+        <link rel="stylesheet/less" type="text/css" href="js/sliderSelectDirective/sliderSelect.less">
+        <link rel="stylesheet/less" type="text/css" href="js/calendarDirective/calendar.less">
+        <link rel="stylesheet/less" type="text/css" href="js/animatedToggle/av-toggle.less">
+    <!-- web app related parameters-->
+        <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+        <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, initial-scale=1.0">
+        <meta name="apple-mobile-web-app-title" content="FixTime">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+        <link rel="icon" href="svg/favicon.ico" type="image/x-icon"/>
+        <link rel="shortcut icon" href="svg/favicon.ico" type="image/x-icon"/>
+        <link rel="icon" type="image/png" href="svg/apple-touch-icon.png">
+        <link rel="apple-touch-icon" href="svg/apple-touch-icon.png">
+    <!-- core JS -->
+        <script src="bower_components/less/dist/less.min.js"></script>
+        <script src="bower_components/jQuery/dist/jquery.min.js"></script>
+        <script src="bower_components/jquery.transit/jquery.transit.js "></script>
+        <script src="bower_components/angular/angular.min.js"></script>
+        <script src="bower_components/angular-sanitize/angular-sanitize.min.js"></script>
+        <script src="bower_components/angular-touch/angular-touch.min.js"></script>
+        <script src="bower_components/fastclick/lib/fastclick.js"></script>
+        <script src="bower_components/momentjs/moment.js"></script>
+    <!-- app JS -->
+        <script src="js/app.js"></script>
+        <script src="js/appController.js"></script>
+        <script src="js/sliderSelectDirective/sliderSelect.js"></script>
+        <script src="js/calendarDirective/calendar.js"></script>
+        <script src="js/animatedToggle/av-toggle.js"></script>
+    <!-- SVG icons lib -->
+    <ng-include src="'svg/icons.svg'"></ng-include>
+</head>
+<body>
+    <div class="root">
+    <!--
+        HOME VIEW
+    -->
+        <div class="view home av-enabled av-hidden av-noanimation">
+            <div class="navbar av-enabled av-hidden av-sequence-2 av-bottom-to-top">
+                <button class="left" ng-click="switchView('sessions')">
+                    <svg><use xlink:href="#svg-navbar-icon-sessions" /></svg>
+                </button>
+                <button class="right" ng-click="switchView('settings')">
+                    <svg><use xlink:href="#svg-navbar-icon-settings" /></svg>
+                </button>
+                <div class="caption with-buttons">TimeFix</div>
+            </div>
+            <div class="balance av-enabled av-hidden av-sequence-2 av-bottom-to-top">
+                <div class="caption">Current balance</div>
+                <div class="time">
+                    {{ ( getTimeBalance() - getTimeBalance() % 60 ) / 60 | formatTimeComponents }}<!--
+                    --><span>h</span><!--
+                    -->{{ getTimeBalance() % 60 | formatTimeComponents}}<!--
+                    --><span>m</span>
+                    <!-- <svg class="circle c1"><use xlink:href="#svg-circle" /></svg> -->
+                    <svg class="circle small"><use xlink:href="#svg-circle-small" /></svg>
+                    <svg class="circle big"><use xlink:href="#svg-circle-big" /></svg>
+                </div>
+                <div
+                    class="icon hand"
+                    ng-class="{
+                        'negative' : getTimeBalance() < 0
+                    }"
+                    >
+                    <svg><use xlink:href="#svg-home-icon-hand" /></svg>
+                </div>
+            </div>
+            <div class="buttons av-enabled av-hidden av-sequence-3 av-bottom-to-top">
+                <button
+                    class="ui-button fix"
+                    ng-click="selectedDate = currentDate.clone(); toggleDialog('edit')">Fix</button>
+            </div>
+        </div>
+    <!--
+        SESSIONS VIEW
+    -->
+        <div class="view sessions av-enabled av-hidden av-noanimation">
+            <button class="ui-button close-view av-enabled av-hidden av-sequence-1 av-bottom-to-top" ng-click="switchView('home')">
+                <svg><use xlink:href="#svg-navbar-icon-close" /></svg>
+            </button>
+            <div class="month-switcher av-enabled av-hidden av-sequence-2 av-bottom-to-top">
+                <button
+                    class="decrease"
+                    ng-click="previousMonth()"
+                    >
+                    <svg>
+                        <g>
+                            <use xlink:href="#svg-arrow-left" />
+                        </g>
+                    </svg>
+                </button>
+                <button
+                    class="increase"
+                    ng-click="nextMonth()"
+                    >
+                    <svg>
+                        <g>
+                            <use xlink:href="#svg-arrow-right" />
+                        </g>
+                    </svg>
+                </button>
+                <div
+                    class="month"
+                    ng-click="currentMonth()"
+                >{{ displayDate.format('MMMM YYYY') }}</div>
+            </div>
+            <div style="clear:both"></div>
+            <calendar
+                selected="selectedDate"
+                sessions="sessions"
+                display="displayDate"
+                onchange="toggleDialog('edit')"
+                class="calendar av-enabled av-hidden av-sequence-3 av-bottom-to-top"></calendar>
+        </div>
+    <!--
+        SETTINGS VIEW
+    -->
+        <div class="view settings av-enabled av-hidden av-noanimation">
+            <div class="navbar av-enabled av-hidden av-sequence-2 av-bottom-to-top">
+                <button class="nav-button right close" ng-click="switchView('home')">
+                    <svg><use xlink:href="#svg-navbar-icon-close" /></svg>
+                </button>
+                <div class="caption with-buttons">Settings</div>
+            </div>
+            <label class="av-enabled av-hidden av-sequence-2 av-bottom-to-top">Theme</label>
+            <slider-select
+                class="av-enabled av-hidden av-sequence-3 av-bottom-to-top"
+                ng-model="settings.theme"
+                list-elements="themes"
+                ng-class="'slider-themes'"
+                ></slider-select>
+            <label class="av-enabled av-hidden av-sequence-4 av-bottom-to-top">Normal working day</label>
+            <slider-select
+                class="av-enabled av-hidden av-sequence-5 av-bottom-to-top"
+                ng-model="settings.defaultWork"
+                list-elements="hoursMinutesElements"
+                list-template="( ( ( element - element % 60 ) / 60 < 10 )? '0' + ( element - element % 60 ) / 60 : ( element - element % 60 ) / 60 ) + '<span>h</span>' + ((element % 60 < 10)?'0'+element % 60:element % 60) + '<span>m</span>'"
+                ng-class="'slider-hours-minutes'"
+                ></slider-select>
+            <div class="buttons av-enabled av-hidden av-sequence-6 av-bottom-to-top">
+                <button
+                    class="ui-button import"
+                    ng-click="toggleDialog('import')"
+                    >Import</button>
+                <button
+                    class="ui-button export"
+                    ng-click="toggleDialog('export')"
+                    >Export</button>
+                <button
+                    class="ui-button reset"
+                    ng-click="toggleDialog('reset')"
+                    >Reset</button>
+            </div>
+        </div>
+    <!--
+        EDIT DIALOG
+    -->
+        <div class="view edit overlay dialog av-enabled av-hidden av-zoom">
+            <button class="ui-button close-dialog" ng-click="toggleDialog('edit')">
+                <svg><use xlink:href="#svg-navbar-icon-close" /></svg>
+            </button>
+            <div class="content">
+                <div
+                    class="date"
+                    >{{ selectedDate.format("MMMM, D") }}</div>
+                <div
+                    class="dow"
+                    >{{ selectedDate.format("dddd") }}</div>
+                <div
+                    class="buttons"
+                    >
+                    <button
+                        class="decrease"
+                        ng-click="previousDay()"
+                        >
+                        <svg>
+                            <g>
+                                <use xlink:href="#svg-arrow-left" />
+                            </g>
+                        </svg>
+                        </button>
+                    <button
+                        class="increase"
+                        ng-click="nextDay()"
+                        >
+                        <svg>
+                            <g>
+                                <use xlink:href="#svg-arrow-right" />
+                            </g>
+                        </svg>
+                        </button>
+                </div>
+                <div class="session">
+                    <div
+                        ng-click="editSessionHours = true; editSessionMinutes = false"
+                        ng-class="{ 'active' : editSessionHours }"
+                    >{{ ( hoursElements [ hoursIndex ] - hoursElements [ hoursIndex ] % 60 ) / 60 | formatTimeComponents }}</div><span>h</span><!--
+                    --><div
+                        ng-click="editSessionHours = false; editSessionMinutes = true"
+                        ng-class="{ 'active' : editSessionMinutes }"
+                    >{{ minutesElements [ minutesIndex ] % 60 | formatTimeComponents }}</div><span>m</span>
+                </div>
+
+                <slider-select
+                    ng-model="hoursIndex"
+                    ng-show="editSessionHours"
+                    list-elements="hoursElements"
+                    list-template="( element / 60 < 10 ) ? '0' + element / 60 : element / 60"
+                    ng-class="'slider-hours'"
+                    ></slider-select>
+
+                <slider-select
+                    ng-model="minutesIndex"
+                    ng-show="editSessionMinutes"
+                    list-elements="minutesElements"
+                    list-template="( element < 10 ) ? '0' + element : element"
+                    ng-class="'slider-minutes'"
+                    ></slider-select>
+                <div
+                    class="compensation"
+                    ng-class="{
+                        'active' : editSession.c,
+                    }"
+                    ng-click="editSession.c = !editSession.c"
+                    >
+                    COMPENSATION
+                </div>
+                <div
+                    class="message"
+                    ng-show="hoursElements[ hoursIndex ] > 480"
+                    >
+                    <p>Please be careful with long work sessions.</p>
+                </div>
+            </div>
+            <button class="ui-button confirm-dialog" ng-click="saveCurrentSession(); toggleDialog('edit')">
+                <svg><use xlink:href="#svg-navbar-icon-ok" /></svg>
+            </button>
+        </div>
+    <!--
+        IMPORT DIALOG
+    -->
+        <div class="view dialog import overlay av-enabled av-hidden av-zoom">
+            <button
+                class="ui-button close-dialog"
+                ng-click="getDataComplete = false; toggleDialog('import')">
+                <svg><use xlink:href="#svg-navbar-icon-close" /></svg>
+            </button>
+            <div class="content">
+                <div class="icon import">
+                    <svg><use xlink:href="#svg-dialog-icon-import" /></svg>
+                </div>
+                <div class="caption">Import</div>
+                <div class="message">
+                    <p>Paste code to import TimeFixes from another device or browser.</p>
+                    <p>Note, that it will replace all your existing TimeFixes.</p>
+                </div>
+                <div>
+                    <input type="text" class="import-link" ng-model="importLink">
+                </div>
+                <div
+                    class="message error"
+                    ng-show="importError">
+                    <p>Error while import. Check your code.</p>
+                </div>
+            </div>
+            <button
+                class="ui-button confirm-dialog"
+                ng-click="importDataFromLink( importLink )"
+                ng-hide="getDataInProgress || getDataComplete"
+                >
+                <svg><use xlink:href="#svg-navbar-icon-ok" /></svg>
+            </button>
+            <button
+                class="ui-button confirm-dialog spinner"
+                ng-show="getDataInProgress"
+                >
+                <svg><use xlink:href="#svg-spinner" /></svg>
+            </button>
+        </div>
+    <!--
+        EXPORT DIALOG
+    -->
+        <div class="view dialog export overlay av-enabled av-hidden av-zoom">
+            <button
+                class="ui-button close-dialog"
+                ng-click="getLinkComplete = false; toggleDialog('export')"
+                >
+                <svg class="icon-holder">
+                    <g class="icon">
+                        <use xlink:href="#svg-navbar-icon-close" />
+                    </g>
+                </svg>
+            </button>
+            <div class="content">
+                <div class="icon export">
+                    <svg class="icon-holder">
+                        <g class="icon">
+                            <use xlink:href="#svg-dialog-icon-export" />
+                        </g>
+                    </svg>
+                </div>
+                <div class="caption">Export</div>
+                <div class="message">
+                    <p>You can transfer your TimeFixes to another device or browser.</p>
+                    <p ng-hide="getLinkComplete">Press confirm to generate code.</p>
+                    <p ng-show="getLinkComplete">Copy the code to export TimeFixes to another device or browser.</p>
+                </div>
+                <div
+                    class="export-link"
+                    ng-show="getLinkComplete"
+                    >
+                    {{ exportLink | formatLink }}
+                </div>
+                <div
+                    class="message error"
+                    ng-show="exportError">
+                    <p>Error while export. Try again.</p>
+                </div>
+            </div>
+            <button
+                class="ui-button confirm-dialog"
+                ng-click="makeExportLink()"
+                ng-hide="getLinkInProgress || getLinkComplete"
+                >
+                <svg class="icon-holder">
+                    <g class="icon">
+                        <use xlink:href="#svg-navbar-icon-ok" />
+                    </g>
+                </svg>
+            </button>
+            <button
+                class="ui-button confirm-dialog spinner"
+                ng-show="getLinkInProgress"
+                >
+                <svg class="icon-holder">
+                    <g class="icon">
+                        <use xlink:href="#svg-spinner" />
+                    </g>
+                </svg>
+            </button>
+        </div>
+    <!--
+        RESET DIALOG
+    -->
+        <div class="view dialog reset overlay av-enabled av-hidden av-zoom">
+            <button class="ui-button close-dialog" ng-click="toggleDialog('reset')">
+                <svg class="icon-holder">
+                    <g class="icon">
+                        <use xlink:href="#svg-navbar-icon-close" />
+                    </g>
+                </svg>
+            </button>
+            <div class="content">
+                <div class="icon reset">
+                    <svg class="icon-holder">
+                        <g class="icon">
+                            <use xlink:href="#svg-dialog-icon-reset" />
+                        </g>
+                    </svg>
+                </div>
+                <div class="caption">Reset</div>
+                <div class="message">
+                    <p>You will lose any saved TimeFixes and settings</p>
+                    <p>Are you sure?</p>
+                </div>
+            </div>
+            <button class="ui-button confirm-dialog" ng-click="resetLocalStorage(); toggleDialog('reset'); switchView('home')">
+                <svg class="icon-holder">
+                    <g class="icon">
+                        <use xlink:href="#svg-navbar-icon-ok" />
+                    </g>
+                </svg>
+            </button>
+        </div>
+    </div>
+</body>
+</html>

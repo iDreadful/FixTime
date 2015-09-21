@@ -1,0 +1,48 @@
+.select-slider {
+    position: relative;
+    width: 100%;
+    height: 50px;
+
+    & .stripe {
+        position: absolute;
+        width: 100%;
+        height: 1px;
+        top: 50%;
+        opacity: .7;
+        -webkit-mask-image: linear-gradient(to right, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 5%, rgba(0,0,0,1) 20%, rgba(0,0,0,0) 50%, rgba(0,0,0,1) 80%, rgba(0,0,0,0) 95%, rgba(0,0,0,0) 100%);
+        background-image: url('sliderStripe.svg');
+        background-size: 20px 10px;
+    }
+
+    button {
+        position: absolute;
+        width: 40px;
+        height: 100%;
+
+        background-repeat: no-repeat;
+        background-position: 50% 50%;
+        background-size: 30px 30px;
+
+        &.decrease {
+            left:0;
+        }
+        &.increase {
+            right:0;
+        }
+        &.inactive {
+            opacity: .2;
+        }
+
+        &:active {
+            opacity: .3;
+        }
+    }
+
+    & .active {
+        position: absolute;
+        width: 100%;
+        line-height: 50px;
+        text-align: center;
+        font-size: 60px;
+    }
+}

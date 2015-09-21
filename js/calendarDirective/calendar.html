@@ -1,0 +1,39 @@
+<div class="dows">
+    <span class="dow">SUN</span>
+    <span class="dow">MON</span>
+    <span class="dow">TUE</span>
+    <span class="dow">WED</span>
+    <span class="dow">THU</span>
+    <span class="dow">FRI</span>
+    <span class="dow">SAT</span>
+</div>
+<div class="week av-enabled av-sequence-2 av-bottom-to-top" ng-repeat="week in weeks">
+    <span class="day-holder"
+        ng-repeat="day in week.days"
+        ng-click="select( day )"
+        >
+        <span class="day"
+            ng-class="{
+                'today':    day.isToday,
+                'selected': day.date.isSame(selected),
+                'weekend' : day.date.day() == 0 || day.date.day() == 6,
+                'month':    day.date.month() != display.month(),
+                'fixed':    getFixTime( day.date ),
+                }"
+            >
+            <span class="digit">
+                {{day.number}}
+            </span>
+            <div
+                class="fix"
+                ng-class="{
+                    'compensation' : isCompensation( day.date ),
+                    }"
+                ng-show="getFixTime( day.date )"
+                >
+                {{ ( ( getFixTime( day.date ) - getFixTime( day.date ) % 60 ) / 60  ) | formatTimeComponents }}:{{  getFixTime( day.date ) % 60 | formatTimeComponents }}
+                <svg class="border"><use xlink:href="#svg-calendar-compensation" /></svg>
+            </div>
+        </span>
+    </span>
+</div>

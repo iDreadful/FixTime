@@ -1,0 +1,60 @@
+/*
+    Animated view transitions
+*/
+ @av-animation-duration: .5s;
+ @av-animation-sequence-duration: .3s;
+ @av-animation-timing-function: cubic-bezier(.7,0,.3,1.5);
+
+// Vendor specific styles
+.av-vendor( @property, @value ) {
+    -webkit-@{property}: @value;
+     -khtml-@{property}: @value;
+       -moz-@{property}: @value;
+        -ms-@{property}: @value;
+            @{property}: @value;
+}
+
+.view {
+    .av-vendor( filter, blur( 0 ) );
+    .av-vendor( transition, filter @av-animation-duration );
+    &.blured {
+       .av-vendor( filter, blur(5px) );
+       & * {
+        .av-vendor( animation-play-state, paused );
+       }
+    }
+}
+
+.av-enabled {
+    .av-vendor( transition, all @av-animation-duration @av-animation-timing-function );
+}
+
+[class*=" av-sequence-"] {
+    .av-vendor( transition, all @av-animation-sequence-duration @av-animation-timing-function );
+    display: block;
+}
+
+.av-bottom-to-top {
+    .av-vendor( transform,  translate3d(0, 0, 0) );
+    opacity: 1;
+    &.av-hidden {
+        .av-vendor( transform,  translate3d(0, 40px, 0) );
+        opacity: 0;
+    }
+}
+
+.av-zoom {
+    .av-vendor( transform, scale(1) );
+    opacity: 1;
+    &.av-hidden {
+        .av-vendor( transform, scale(.6) );
+        opacity: 0;
+    }
+}
+
+.av-noanimation {
+    opacity: 1;
+    &.av-hidden {
+        opacity: 0;
+    }
+}
