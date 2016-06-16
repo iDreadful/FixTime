@@ -333,7 +333,8 @@ app.controller( 'appController', function( $scope, $http, $timeout ) {
         function getLink( json, callback ) {
             var data = JSON.stringify( json );
             var pieceLength = 1000;
-            var key = "AIzaSyANFw1rVq_vnIzT4vVOwIw3fF1qHXV7Mjw";
+            //var key = "AIzaSyANFw1rVq_vnIzT4vVOwIw3fF1qHXV7Mjw";
+            var key = "AIzaSyDBgo56txclouOSrm65C942oyvH36MFbBs";
             var pieces = [];
             var position = 0;
 
