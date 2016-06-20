@@ -388,8 +388,7 @@ app.controller( 'appController', function( $scope, $http, $timeout ) {
 
         // Get data from URL chain
         function getData ( link, callback ) {
-            //var key = "AIzaSyANFw1rVq_vnIzT4vVOwIw3fF1qHXV7Mjw";
-            var key = "AIzaSyDBgo56txclouOSrm65C942oyvH36MFbBs";
+            var key = "AIzaSyANFw1rVq_vnIzT4vVOwIw3fF1qHXV7Mjw";
 
             // This will be repeated fo revery piece
             function iterator ( link, glue ) {
